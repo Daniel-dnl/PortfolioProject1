@@ -111,4 +111,17 @@ WHERE dea.continent IS NOT null
 )
 SELECT * , (RollingPeoplaVaccinated/population)*100 as percentvaccinated
 FROM popvsvac
-where location = 'india';
+--where location = 'india';
+
+-- creating view global cases
+
+CREATE VIEW PercentagePopulationVaccinated as
+SELECT dea.continent,dea.location,dea.date,dea.population ,vac.new_vaccinations
+,SUM(cast(vac.new_vaccinations as float)) OVER (Partition by dea.location Order by dea.location, dea.Date) as RollingPeopleVaccinated
+FROM covidDeaths dea
+join covidVaccination vac
+ON dea.location = vac.location and dea.date = vac.date
+WHERE dea.continent IS NOT null
+
+
+SELECT * FROM PercentagePopulationVaccinated;
